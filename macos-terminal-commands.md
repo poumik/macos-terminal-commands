@@ -30,8 +30,8 @@ Commands work in both `zsh` and `bash` unless noted. ⚠️ marks commands needi
 # List available macOS updates (no install)
 softwareupdate --list
 
-# List updates as machine-readable JSON
-softwareupdate --list --no-scan   # skip network scan (uses local cache)
+# List updates without a fresh network scan (reuse results of the last scan)
+softwareupdate --list --no-scan
 
 # Install all available updates
 sudo softwareupdate --install --all          # ⚠️ may reboot
@@ -66,8 +66,9 @@ brew outdated
 brew outdated --verbose          # show current vs. new versions
 brew outdated --greedy           # include casks with auto_updates: true
 
-# Upgrade everything (formulae + casks)
+# Upgrade everything — formulae + casks (auto-updating casks excluded unless --greedy)
 brew upgrade
+brew upgrade --greedy               # also upgrade casks with auto_updates: true
 
 # Upgrade formulae only / casks only
 brew upgrade --formula
@@ -309,7 +310,8 @@ log show --last 1h --predicate 'eventMessage contains "error"'  # past errors
 # Recent system boot/shutdown/crash history
 last reboot
 last shutdown
-ls -lt /Library/Logs/DiagnosticReports/ | head    # recent crash reports
+ls -lt ~/Library/Logs/DiagnosticReports/ | head  # recent crash reports (user apps — most common)
+ls -lt /Library/Logs/DiagnosticReports/ | head   # system-wide crash reports
 ```
 
 ---
@@ -324,9 +326,13 @@ df -h
 diskutil list
 diskutil info /                   # details of the system volume
 
-# Verify / repair a volume's filesystem (⚠️ repair needs sudo; ⚠️ can cause data loss if interrupted)
+# Verify a volume's filesystem (safe, read-only)
 diskutil verifyVolume /
-sudo diskutil repairVolume /      # usually not needed on APFS (self-healing)
+
+# Repair a volume's filesystem (⚠️ sudo; usually unneeded on APFS — self-healing)
+# Note: the live boot volume can't be repaired while booted from it —
+# use Recovery Mode (or target a non-boot volume) if repair is really needed.
+sudo diskutil repairVolume /
 
 # Size of a directory (add -h for human-readable)
 du -sh ~/Downloads
@@ -397,9 +403,10 @@ lsof -i -P | grep LISTEN         # all listening ports (no service-name translat
 # Flush DNS cache
 sudo dscacheutil -flushcache && sudo killall -HUP mDNSResponder
 
-# Wi-Fi diagnostics (⚠️ airport path varies by macOS version)
+# Wi-Fi diagnostics — wdutil is the reliable option on all modern Macs
 sudo wdutil info                          # current Wi-Fi status/details
-/System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport -I   # legacy tool
+# legacy airport tool — removed on newer macOS releases; may not exist on your Mac
+/System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport -I
 
 # Wi-Fi on/off + forget network
 networksetup -setairportpower en0 on

@@ -18,7 +18,8 @@ Commands work in both `zsh` and `bash` unless noted. ⚠️ marks commands needi
 4. [Network](#4-network)
 5. [System Maintenance Utilities](#5-system-maintenance-utilities)
 6. [Services & Processes](#6-services--processes)
-7. [Useful Aliases](#7-useful-aliases)
+7. [Quick Utilities & Clipboard](#7-quick-utilities--clipboard)
+8. [Useful Aliases](#8-useful-aliases)
 
 ---
 
@@ -247,6 +248,8 @@ pyenv update                      # update pyenv itself (needs pyenv-update plug
 
 # --- Homebrew-managed Python note ---
 # `brew upgrade` also upgrades brew-installed Python versions.
+# --formula is kept intentionally: plain `brew list | grep python` also
+# matches casks, so this stays scoped to CLI formulae only.
 brew list --formula | grep python
 ```
 
@@ -363,8 +366,16 @@ diskutil unmountDisk /dev/disk2   # ⚠️ unmounts ALL volumes on that disk
 # Clear app caches (⚠️ apps must be closed; safe to delete, they regenerate)
 rm -rf ~/Library/Caches/*         # ⚠️ review first — some apps store state here
 
-# Empty Trash from all volumes
-sudo rm -rf ~/.Trash/* /Volumes/*/.Trashes/*   # ⚠️ irreversible
+# Empty Trash — safer, Finder-native way (handles per-user .Trashes/$UID/
+# structure on external volumes correctly; a raw wildcard glob can hit
+# permission errors or skip files there)
+osascript -e 'tell application "Finder" to empty trash'
+
+# Empty Trash from all volumes — raw filesystem wildcard
+# ⚠️ irreversible, no confirmation, and the /Volumes/* glob hits EVERY
+# mounted volume (external drives, network shares, disk images) —
+# unmount anything you don't want touched first, or scope to one volume by name
+sudo rm -rf ~/.Trash/* /Volumes/*/.Trashes/*
 ```
 
 ---
@@ -519,7 +530,7 @@ open -R ~/Downloads/file.pdf      # reveal in Finder
 # Process management
 pgrep -fl python                  # find processes by name, show command line
 pkill -f "python script.py"       # kill by name/match
-kill -TERM 12345                  # graceful stop (default signal)
+kill -TERM 12345                  # graceful stop (TERM is kill's default signal, so plain `kill 12345` does the same)
 kill -9 12345                     # ⚠️ force kill — no cleanup, last resort
 killall Safari                    # kill all processes named Safari (⚠️ unsaved data)
 
@@ -533,7 +544,32 @@ renice -n 10 -p 12345             # lower priority of a running process
 
 ---
 
-## 7. Useful Aliases
+## 7. Quick Utilities & Clipboard
+
+```bash
+# Clipboard — pipe text in/out without leaving the terminal
+cat file.txt | pbcopy             # copy a file's contents to the clipboard
+pbpaste > newfile.txt             # paste clipboard contents into a file
+pbpaste | grep "TODO"             # pipe clipboard contents into another command
+
+# Spotlight search from the CLI — index-backed, much faster than `find` for broad searches
+mdfind "quarterly report"         # search entire index by content/name
+mdfind -onlyin ~/Documents "invoice"   # scope search to one folder
+
+# Keep the Mac awake during a long-running task (no need to touch System Settings)
+caffeinate -t 3600                # stay awake for 1 hour, then allow sleep again
+caffeinate -i long_command        # stay awake only while long_command runs
+
+# Quick Look preview from the terminal (same as pressing Space in Finder)
+qlmanage -p image.png             # opens a Quick Look preview window
+
+# Open the current directory in Finder
+open .
+```
+
+---
+
+## 8. Useful Aliases
 
 Add to `~/.zshrc` (and/or `~/.bashrc`), then `source ~/.zshrc`:
 

@@ -16,10 +16,11 @@ Commands work in both `zsh` and `bash` unless noted. ⚠️ marks commands needi
 2. [System Monitoring](#2-system-monitoring)
 3. [Disk & Storage Maintenance](#3-disk--storage-maintenance)
 4. [Network](#4-network)
-5. [System Maintenance Utilities](#5-system-maintenance-utilities)
-6. [Services & Processes](#6-services--processes)
-7. [Quick Utilities & Clipboard](#7-quick-utilities--clipboard)
-8. [Useful Aliases](#8-useful-aliases)
+5. [Security & Gatekeeper](#5-security--gatekeeper)
+6. [System Maintenance Utilities](#6-system-maintenance-utilities)
+7. [Services & Processes](#7-services--processes)
+8. [Quick Utilities & Clipboard](#8-quick-utilities--clipboard)
+9. [Useful Aliases](#9-useful-aliases)
 
 ---
 
@@ -325,9 +326,13 @@ ls -lt /Library/Logs/DiagnosticReports/ | head   # system-wide crash reports
 # Human-readable disk usage for all mounted volumes
 df -h
 
+# Storage breakdown by category (the CLI version of the Storage settings panel)
+system_profiler SPStorageDataType
+
 # Check APFS container / volume layout
 diskutil list
 diskutil info /                   # details of the system volume
+diskutil apfs list                # container-level free/used space shared across all volumes
 
 # Verify a volume's filesystem (safe, read-only)
 diskutil verifyVolume /
@@ -339,6 +344,7 @@ sudo diskutil repairVolume /
 
 # Size of a directory (add -h for human-readable)
 du -sh ~/Downloads
+du -d 1 -h ~/Documents                  # top-level folders only — faster first pass than full -sh
 du -sh ~/Library/Caches/* | sort -h     # find biggest cache dirs
 
 # Interactive disk usage explorer (brew install ncdu) — navigate + delete
@@ -395,6 +401,9 @@ ifconfig en0 | grep 'inet6 '      # IPv6
 # External / public IP
 curl -s ifconfig.me; echo
 
+# Internet speed test — built-in, no browser or third-party tool needed (macOS Monterey+)
+networkQuality
+
 # Ping / traceroute / DNS lookup
 ping -c 4 1.1.1.1                 # 4 packets then stop
 traceroute example.com
@@ -405,6 +414,9 @@ nslookup example.com
 # Routing table / default gateway
 netstat -rn | head -20
 route get default
+
+# Live per-process network usage (network equivalent of `top`)
+nettop
 
 # Show open network connections + owning process (very useful)
 lsof -i                          # all connections
@@ -443,9 +455,30 @@ lsof -i -P -n | grep -i tcp
 
 ---
 
-## 5. System Maintenance Utilities
+## 5. Security & Gatekeeper
 
 ```bash
+# Remove the quarantine flag macOS adds to downloaded apps — the actual fix
+# behind "can't be opened because it is from an unidentified developer"
+xattr -d com.apple.quarantine /path/to/App.app
+
+# Check whether an app passes Gatekeeper, and why (or why not)
+spctl --assess -vv /path/to/App.app
+
+# Check System Integrity Protection status (read-only; changing it requires
+# Recovery Mode, out of scope for a terminal-only guide)
+csrutil status
+```
+
+---
+
+## 6. System Maintenance Utilities
+
+```bash
+# Generate a full diagnostic archive (logs + system state) — for filing a bug
+# with Apple or handing to support. Takes a couple minutes; drops a .tar.gz on the Desktop.
+sudo sysdiagnose
+
 # Time Machine
 tmutil status                     # current backup status
 tmutil destinationinfo            # where backups go
@@ -498,7 +531,7 @@ sudo shutdown -h now              # ⚠️ shutdown
 
 ---
 
-## 6. Services & Processes
+## 7. Services & Processes
 
 ```bash
 # List all running launchd services (label, PID, last exit status)
@@ -544,7 +577,7 @@ renice -n 10 -p 12345             # lower priority of a running process
 
 ---
 
-## 7. Quick Utilities & Clipboard
+## 8. Quick Utilities & Clipboard
 
 ```bash
 # Clipboard — pipe text in/out without leaving the terminal
@@ -569,7 +602,7 @@ open .
 
 ---
 
-## 8. Useful Aliases
+## 9. Useful Aliases
 
 Add to `~/.zshrc` (and/or `~/.bashrc`), then `source ~/.zshrc`:
 

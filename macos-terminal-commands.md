@@ -598,6 +598,40 @@ alias ls='ls -GFh'                # colors, type suffixes, human sizes
 alias ll='ls -la'
 alias ..='cd ..'
 alias ...='cd ../..'
+
+# --- Safety & Convenience ---
+alias rm='rm -i'                       # prompt before deleting a file — note: `rm -rf` overrides
+                                        # this (the later -f wins), so it does NOT protect force-deletes
+alias cp='cp -iv'                      # prompt before overwrite and show progress
+alias mv='mv -iv'                      # prompt before overwrite and show move progress
+alias c='clear'                        # quickly clear the screen
+
+# --- macOS Specifics ---
+alias copy='pbcopy'                    # pipe text to clipboard (e.g., cat key.pub | copy)
+alias cbpaste='pbpaste'                # paste from clipboard — named to avoid shadowing the
+                                        # real `paste` utility (merges lines from files)
+ql() { qlmanage -p "$@" >& /dev/null; } # Quick Look from terminal (ql image.png) — must be a
+                                        # function, not an alias, so it actually receives args
+alias lock='/System/Library/CoreServices/"Menu Extras"/User.menu/Contents/Resources/CGSession -suspend'
+                                        # forces the real login/lock screen (displaysleepnow only
+                                        # locks if "require password after sleep" is enabled)
+alias afk='caffeinate -u -t 3600'      # keep Mac awake for an hour (e.g., during large downloads)
+
+# --- Navigation ---
+alias dl='cd ~/Downloads'
+alias dt='cd ~/Desktop'
+alias docs='cd ~/Documents'
+alias path='echo -e ${PATH//:/\\n}'    # print PATH variable neatly, one entry per line
+
+# --- Git Shortcuts (useful for devs) ---
+alias gs='git status'
+alias ga='git add .'
+alias gc='git commit -m'
+alias gp='git push'
+alias gl='git log --oneline --graph --decorate --all' # show Git history as a clean, readable tree
+
+# --- Fun & Network Tools ---
+alias weather='curl wttr.in/Helsinki'  # weather forecast in the terminal (change city name as needed)
 ```
 
 ---

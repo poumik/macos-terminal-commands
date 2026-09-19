@@ -375,7 +375,13 @@ sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder
 diskutil eject /Volumes/USBDrive
 diskutil unmountDisk /dev/disk2   # ⚠️ unmounts ALL volumes on that disk
 
-# Clear app caches (⚠️ apps must be closed; safe to delete, they regenerate)
+# Inspect before deleting — see what's actually large, then remove just that
+# folder (safer than the blanket wipe below, and just as effective for most cases)
+du -sh ~/Library/Caches/* | sort -rh | head -10
+rm -rf ~/Library/Caches/SomeApp     # delete one app's cache after checking it above
+
+# Clear ALL app caches at once (⚠️ apps must be closed; usually regenerates fine,
+# but a few apps store real state here — the targeted version above is safer)
 rm -rf ~/Library/Caches/*         # ⚠️ review first — some apps store state here
 
 # Empty Trash — safer, Finder-native way (handles per-user .Trashes/$UID/
@@ -398,9 +404,13 @@ sudo rm -rf ~/.Trash/* /Volumes/*/.Trashes/*
 # Show all network interfaces with status
 networksetup -listallnetworkservices
 ifconfig                          # full interface details
-ifconfig en0 | grep ether         # MAC address of Wi-Fi/Ethernet
 
-# Get current IP address (en0 = Wi-Fi on most Macs, en1 on desktops)
+# Interface names vary by machine — en0 is typical but not guaranteed
+# (varies with Wi-Fi/Ethernet, dongles, VPNs); confirm yours first:
+networksetup -listallhardwareports
+ifconfig en0 | grep ether         # MAC address of Wi-Fi/Ethernet — replace en0 with your interface
+
+# Get current IP address (en0 = Wi-Fi on most Macs, en1 on desktops — verify above)
 ipconfig getifaddr en0            # IPv4
 ifconfig en0 | grep 'inet6 '      # IPv6
 
@@ -437,9 +447,7 @@ sudo wdutil info                          # current Wi-Fi status/details
 # legacy airport tool — removed on newer macOS releases; may not exist on your Mac
 /System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport -I
 
-# Wi-Fi on/off + forget network
-# Interface names vary by machine — `en0` is typical but not guaranteed;
-# run `networksetup -listallhardwareports` to find your Wi-Fi interface first.
+# Wi-Fi on/off + forget network (confirm your interface via -listallhardwareports above)
 networksetup -setairportpower en0 on
 networksetup -setairportpower en0 off
 networksetup -removepreferredwirelessnetwork en0 "NetworkName"
@@ -686,7 +694,7 @@ alias weather='curl wttr.in/Helsinki'  # weather forecast in the terminal (chang
 ```bash
 brew update && brew outdated && mas outdated      # check what needs updating
 brew upgrade && mas upgrade                       # update apps
-brew autoremove && brew cleanup --prune=all       # reclaim disk space
+brew autoremove && brew cleanup --prune=all       # ⚠️ destructive cleanup — removes old formula/cask versions and downloads
 softwareupdate --list                             # check OS updates
 brew doctor                                       # sanity check
 df -h /                                           # keep an eye on disk space

@@ -63,4 +63,4 @@ This guide includes destructive commands — some can remove caches, reset netwo
 
 ## License
 
-This project is licensed under the [MIT License](LICENSE).
+This project is licensed under the [MIT License](LICENSE.txt).

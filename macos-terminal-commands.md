@@ -2,6 +2,7 @@
 
 Quick reference for keeping macOS, apps, and packages up to date, maintaining the system, and monitoring its health.
 Commands work in both `zsh` and `bash` unless noted. ⚠️ marks commands needing `sudo` or extra care.
+Safety scale: unmarked commands are read-only/diagnostic, ⚠️ modifies state or needs care, explicit destructive/irreversible warnings delete data — never run those blindly. Flags vary by macOS release; check `man <command>` if one errors.
 
 ---
 
@@ -36,7 +37,9 @@ softwareupdate --list
 softwareupdate --list --no-scan
 
 # Install all available updates
-sudo softwareupdate --install --all          # ⚠️ may reboot
+sudo softwareupdate --install --all          # ⚠️ may reboot; can also pull a major
+                                              # OS upgrade — prefer --recommended
+                                              # unless you specifically need everything
 
 # Install a specific update (use the exact name from --list output)
 sudo softwareupdate --install "macOS 15.7.1-24Hxxx"
@@ -202,7 +205,10 @@ npx npm-check -u -g
 npm install -g npm@latest
 npm doctor                        # diagnose npm environment
 
-# Clear npm cache if installs act up
+# Check the npm cache for corruption/consistency (preferred, non-destructive)
+npm cache verify
+
+# Wipe the npm cache entirely (legacy last resort; --force is required by npm)
 npm cache clean --force
 
 # --- nvm (Node version manager) ---
@@ -416,10 +422,10 @@ netstat -rn | head -20
 route get default
 
 # Live per-process network usage (network equivalent of `top`)
-nettop
+nettop                            # some per-process detail needs root; prefix sudo if output is thin
 
 # Show open network connections + owning process (very useful)
-lsof -i                          # all connections
+lsof -i                          # all connections; run under sudo to see other users' sockets
 lsof -i :3000                     # what's listening on port 3000
 lsof -i -P | grep LISTEN         # all listening ports (no service-name translation)
 
@@ -432,6 +438,8 @@ sudo wdutil info                          # current Wi-Fi status/details
 /System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport -I
 
 # Wi-Fi on/off + forget network
+# Interface names vary by machine — `en0` is typical but not guaranteed;
+# run `networksetup -listallhardwareports` to find your Wi-Fi interface first.
 networksetup -setairportpower en0 on
 networksetup -setairportpower en0 off
 networksetup -removepreferredwirelessnetwork en0 "NetworkName"
@@ -460,6 +468,7 @@ lsof -i -P -n | grep -i tcp
 ```bash
 # Remove the quarantine flag macOS adds to downloaded apps — the actual fix
 # behind "can't be opened because it is from an unidentified developer"
+# Only do this for apps you trust — the flag is a Gatekeeper safety feature.
 xattr -d com.apple.quarantine /path/to/App.app
 
 # Check whether an app passes Gatekeeper, and why (or why not)
@@ -492,8 +501,9 @@ sudo mdutil -E /                  # erase index and reindex
 sudo mdutil -i on /               # enable indexing
 sudo mdutil -s /                  # show indexing status
 
-# Reset an app's state without reinstalling (⚠️ app-specific data lost)
-defaults delete com.apple.Safari  # example
+# Reset an app's state without reinstalling (⚠️ removes that app's saved
+# settings/data — targeted troubleshooting only, not a routine command)
+defaults delete com.apple.Safari  # example — replace with the actual bundle id
 
 # View/change hidden system preferences (example: show hidden files)
 defaults write com.apple.finder AppleShowAllFiles -bool true && killall Finder
@@ -542,7 +552,9 @@ launchctl list | grep -v 'com.apple'    # non-Apple services
 launchctl print system/com.example.service
 launchctl print gui/$(id -u)/com.example.service   # user-domain services
 
-# Enable/disable services (⚠️ SIP may block modifying system services)
+# Enable/disable services (⚠️ SIP may block modifying system services;
+# altering system services can disrupt running apps — know the label first)
+# Example only — replace `com.apple.example.service` with the actual service label
 sudo launchctl disable system/com.apple.example.service
 sudo launchctl enable system/com.apple.example.service
 
@@ -610,7 +622,7 @@ Add to `~/.zshrc` (and/or `~/.bashrc`), then `source ~/.zshrc`:
 # --- Update everything ---
 alias update='softwareupdate --list; brew update; brew outdated; mas outdated; npm outdated -g'
 alias upgrade='brew upgrade; brew upgrade --cask; mas upgrade; npm update -g'
-alias update-all='brew update && brew upgrade && brew upgrade --cask && brew autoremove && brew cleanup && mas upgrade && npm update -g && softwareupdate --install --all'
+alias update-all='brew update && brew upgrade && brew upgrade --cask && brew autoremove && brew cleanup && mas upgrade && npm update -g && softwareupdate --install --recommended'
 
 # --- Maintenance ---
 alias brewcheck='brew doctor && brew missing'

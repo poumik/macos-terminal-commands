@@ -39,13 +39,16 @@ brew outdated
 mas outdated
 
 # One-shot full update (see Aliases section for the update-all alias)
-brew update && brew upgrade && mas upgrade && softwareupdate --install --all
+# --recommended: skips major OS upgrades that --all would pull in
+brew update && brew upgrade && mas upgrade && softwareupdate --install --recommended
 ```
 
 ## Conventions
 
 - Commands work in both `zsh` (default) and `bash` unless noted.
 - ⚠️ marks commands requiring `sudo` or extra care.
+- Safety scale: unmarked = read-only/diagnostic; ⚠️ = modifies state or needs care; explicit destructive/irreversible warnings = deletes data.
+- Before any `sudo` or destructive command, verify the target and make sure you have a backup.
 - Version-agnostic: if a flag errors on your macOS release, check `man <command>`.
 
 ## Contributing
@@ -54,7 +57,7 @@ Found a missing command, a better flag, or an error? Open an issue or a pull req
 
 ## ⚠️ Disclaimer
 
-This guide is provided for informational purposes only. Commands — especially those marked ⚠️ — can modify system settings, delete data, or otherwise alter your Mac's state. **Always understand a command before running it, back up important data, and verify against `man <command>` on your macOS release.** The authors are not responsible for any data loss, system damage, or other issues arising from the use of these commands. Use at your own risk.
+This guide includes destructive commands — some can remove caches, reset network or boot settings, or delete data from mounted volumes. Commands — especially those marked ⚠️ — can modify system settings, delete data, or otherwise alter your Mac's state. **Always understand a command before running it, back up important data, and verify against `man <command>` on your macOS release.** The authors are not responsible for any data loss, system damage, or other issues arising from the use of these commands. Use at your own risk.
 
 ## License
 

@@ -11,9 +11,11 @@ The full guide lives in [`macos-terminal-commands.md`](macos-terminal-commands.m
 | **System Update & Maintenance** | `softwareupdate`, Homebrew (formulae + casks), Mac App Store (`mas`), npm, pip, nvm, pyenv |
 | **System Monitoring** | `top`/`htop`, `ps`, memory pressure, swap, CPU/battery/power, `log stream`, crash reports |
 | **Disk & Storage Maintenance** | `df`/`du`/`ncdu`, `diskutil`, APFS snapshots, cache cleanup |
-| **Network** | interfaces, IPs, DNS, open ports (`lsof -i`), Wi-Fi diagnostics, proxies |
-| **System Maintenance Utilities** | Time Machine (`tmutil`), Spotlight reindexing (`mdutil`), `defaults`, Dock/Finder restarts |
+| **Network** | interfaces, IPs, DNS, open ports (`lsof -i`), Wi-Fi diagnostics, proxies, `networkQuality`, `nettop` |
+| **Security & Gatekeeper** | quarantine removal (`xattr`), Gatekeeper checks (`spctl`), SIP status (`csrutil`) |
+| **System Maintenance Utilities** | Time Machine (`tmutil`), Spotlight reindexing (`mdutil`), `defaults`, Dock/Finder restarts, `sysdiagnose` |
 | **Services & Processes** | `launchctl`, `brew services`, process management, background jobs |
+| **Quick Utilities & Clipboard** | `pbcopy`/`pbpaste`, `mdfind`, `caffeinate`, Quick Look (`qlmanage`), `open .` |
 | **Useful Aliases** | copy-paste `.zshrc`/`.bashrc` aliases incl. one-shot `update-all` |
 
 Plus a suggested **weekly maintenance routine** and **safety notes** for `sudo`/destructive commands.

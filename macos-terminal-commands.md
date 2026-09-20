@@ -1,8 +1,8 @@
 # macOS Terminal Commands — Update / Maintain / Monitor
 
 Quick reference for keeping macOS, apps, and packages up to date, maintaining the system, and monitoring its health.
-Commands work in both `zsh` and `bash` unless noted. ⚠️ marks commands needing `sudo` or extra care.
-Safety scale: unmarked commands are read-only/diagnostic, ⚠️ modifies state or needs care, explicit destructive/irreversible warnings delete data — never run those blindly. Flags vary by macOS release; check `man <command>` if one errors.
+Commands work in both `zsh` and `bash` unless noted. ⚠️ marks commands **requiring** `sudo` or extra care.
+Safety scale: unmarked commands are read-only/diagnostic, ⚠️ **modifies system state or requires caution**, and explicit destructive/irreversible warnings **delete data** — never run those blindly. Flags vary by macOS release; check `man <command>` if one errors.
 
 ---
 
@@ -27,13 +27,13 @@ Safety scale: unmarked commands are read-only/diagnostic, ⚠️ modifies state 
 
 ## 1. System Update & Maintenance
 
-### macOS Software Updates
+## macOS Software Updates
 
 ```bash
-# List available macOS updates (no install)
+# List available macOS updates (no install).
 softwareupdate --list
 
-# List updates without a fresh network scan (reuse results of the last scan)
+# List updates without a fresh network scan (reuse results of the last scan).
 softwareupdate --list --no-scan
 
 # Install all available updates
@@ -41,143 +41,143 @@ sudo softwareupdate --install --all          # ⚠️ may reboot; can also pull 
                                               # OS upgrade — prefer --recommended
                                               # unless you specifically need everything
 
-# Install a specific update (use the exact name from --list output)
+# Install a specific update (use the exact name from --list output).
 sudo softwareupdate --install "macOS 15.7.1-24Hxxx"
 
-# Install only recommended updates
+# Install only recommended updates.
 sudo softwareupdate --install --recommended
 
-# Download updates without installing
+# Download updates without installing.
 softwareupdate --download --all
 
-# Install Rosetta 2 (needed for Intel apps on Apple Silicon)
+# Install Rosetta 2 (needed for Intel apps on Apple Silicon).
 softwareupdate --install-rosetta --agree-to-license
 
-# Download the full macOS installer for a specific version
+# Download the full macOS installer for a specific version.
 softwareupdate --fetch-full-installer --full-installer-version 15.7
 
-# Trigger the GUI Software Update pane
+# Trigger the GUI Software Update pane.
 open "x-apple.systempreferences:com.apple.preferences.softwareupdate"
 ```
 
 ### Homebrew (brew + casks)
 
 ```bash
-# Update Homebrew itself + formula/cask definitions
+# Update Homebrew itself + formula/cask definitions.
 brew update
 
-# Show what's outdated (formulae and casks)
+# Show what's outdated (formulae and casks).
 brew outdated
-brew outdated --verbose          # show current vs. new versions
-brew outdated --greedy           # include casks with auto_updates: true
+brew outdated --verbose          # Show current vs. new versions.
+brew outdated --greedy           # Include casks with auto_updates: true.
 
-# Upgrade everything — formulae + casks (auto-updating casks excluded unless --greedy)
+# Upgrade everything — formulae + casks (auto-updating casks excluded unless --greedy).
 brew upgrade
-brew upgrade --greedy               # also upgrade casks with auto_updates: true
+brew upgrade --greedy               # Also upgrade casks with auto_updates: true.
 
-# Upgrade formulae only / casks only
+# Upgrade formulae only / casks only.
 brew upgrade --formula
 brew upgrade --cask
 
-# Upgrade a specific package
+# Upgrade a specific package.
 brew upgrade wget
 brew upgrade --cask visual-studio-code
 
-# Dry run — show what would be upgraded without doing it
+# Dry run — show what would be upgraded without doing it.
 brew upgrade --dry-run
 
-# Remove stale lock files and old downloads, free disk space
+# Remove stale lock files and old downloads, free disk space.
 brew cleanup
-brew cleanup --prune=all         # remove ALL old versions/downloads
-brew cleanup -s                  # clear download cache too
+brew cleanup --prune=all         # Remove ALL old versions/downloads.
+brew cleanup -s                  # Clear download cache too.
 
-# Remove orphaned dependencies of uninstalled formulae
+# Remove orphaned dependencies of uninstalled formulae.
 brew autoremove
 
-# Health check — diagnose common problems
+# Health check — diagnose common problems.
 brew doctor
 
-# Show install location / environment info
+# Show install location / environment info.
 brew --prefix
 brew config
 
-# List installed packages
-brew list                        # everything
-brew list --formula              # CLI packages
-brew list --cask                 # GUI apps
-brew leaves                      # top-level packages (no dependents)
+# List installed packages.
+brew list                        # Everything.
+brew list --formula              # CLI packages.
+brew list --cask                 # GUI apps.
+brew leaves                      # Top-level packages (no dependents).
 
-# Show info / dependencies for a package
+# Show info / dependencies for a package.
 brew info wget
 brew deps wget
 
-# Pin a formula so `brew upgrade` skips it
+# Pin a formula so `brew upgrade` skips it.
 brew pin wget
 brew unpin wget
 
-# Search for packages
+# Search for packages.
 brew search neovim
 
-# Install / uninstall
+# Install / uninstall.
 brew install wget
 brew uninstall wget
 brew uninstall --zap --cask app  # ⚠️ also removes app's config/data files
 
-# Export installed packages to a Brewfile / restore from it
-brew bundle dump                 # writes Brewfile in current dir
+# Export installed packages to a Brewfile / restore from it.
+brew bundle dump                 # Writes Brewfile in current dir.
 brew bundle dump --file=~/Brewfile
 brew bundle install --file=~/Brewfile
 
-# See what's using the most space
+# See what's using the most space.
 brew cleanup -n                  # dry-run: what cleanup would remove
 ```
 
 ### Mac App Store (mas)
 
-> **What is mas?** `mas` (Mac App Store CLI) is a third-party open-source tool (https://github.com/mas-cli/mas) that lets you search, install, and upgrade App Store apps from the terminal. It uses the same private frameworks as the App Store app, so anything it installs is fully compatible with the GUI.
+> **What is mas?** `mas` (Mac App Store CLI) is a third-party open-source tool (https://github.com/mas-cli/mas) **for searching, installing, and upgrading App Store apps from the terminal**. It uses the same private frameworks as the App Store app, so anything it installs is fully compatible with the GUI.
 >
 > **Install**: `brew install mas`
 > **Requirements**: macOS with App Store; signing into the App Store GUI app is required for *installing* — `mas upgrade` works even when signed out (on recent macOS versions).
 
 ```bash
-# List all apps installed from the App Store (ID, name, version)
+# List all apps installed from the App Store (ID, name, version).
 mas list
 
-# Search the App Store (shows app ID, name, price)
+# Search the App Store (shows app ID, name, price).
 mas search xcode
-mas search "pixelmator" --price    # include price info
+mas search "pixelmator" --price    # Include price info.
 
-# Show apps with available updates
-mas outdated                      # lists ID, name, old -> new version
+# Show apps with available updates.
+mas outdated                      # Lists ID, name, old -> new version.
 
-# Upgrade all App Store apps
+# Upgrade all App Store apps.
 mas upgrade
 
-# Upgrade a specific app (use app ID from mas list/outdated)
-mas upgrade 497799835             # Xcode
+# Upgrade a specific app (use app ID from mas list/outdated).
+mas upgrade 497799835             # Xcode.
 
-# Install an app by ID (must be signed in to App Store)
+# Install an app by ID (must be signed in to App Store).
 mas install 497799835
-mas install 497799835 409203825   # multiple apps at once
+mas install 497799835 409203825   # Multiple apps at once.
 
-# Get info about an app (version, developer, price)
+# Get info about an app (version, developer, price).
 mas info 497799835
 
-# Open an app's App Store page (find ID without installing)
-mas open 497799835                # opens App Store GUI to that app
+# Open an app's App Store page (find ID without installing).
+mas open 497799835                # Opens App Store GUI to that app.
 
-# Look up the ID of an app by its bundle identifier
+# Look up the ID of an app by its bundle identifier.
 mas find com.apple.dt.Xcode
 
-# Sign in / out (⚠️ interactive; sign-in is often flaky — use the App Store GUI instead)
+# Sign in / out (⚠️ interactive; sign-in is often flaky — use the App Store GUI instead).
 mas signin "you@example.com"
 mas signout
 
-# Version of mas itself
+# Version of mas itself.
 mas version
 ```
 
-> **Troubleshooting mas**
+> **Troubleshooting MAS**
 > - `mas signin` fails or hangs on newer macOS → sign in via the App Store GUI; mas picks it up.
 > - `mas install` says "Not signed in" → open App Store, sign in, retry.
 > - `mas upgrade` finds no apps but App Store shows updates → run `softwareupdate --list`; some Apple system apps update via softwareupdate, not mas.
@@ -186,38 +186,38 @@ mas version
 ### Node.js / npm
 
 ```bash
-# Update global npm packages to latest allowed by semver ranges
+# Update global npm packages to latest allowed by semver ranges.
 npm update -g
 
-# Check which global packages are outdated
+# Check which global packages are outdated.
 npm outdated -g
 
-# Upgrade a global package to the newest version
+# Upgrade a global package to the newest version.
 npm install -g typescript@latest
 
-# List global packages
+# List global packages.
 npm list -g --depth=0
 
-# Interactive upgrade tool (pick which globals to upgrade)
+# Interactive upgrade tool (pick which globals to upgrade).
 npx npm-check -u -g
 
-# Update npm itself
+# Update npm itself.
 npm install -g npm@latest
-npm doctor                        # diagnose npm environment
+npm doctor                        # Diagnose npm environment.
 
-# Check the npm cache for corruption/consistency (preferred, non-destructive)
+# Check the npm cache for corruption/consistency (preferred, non-destructive).
 npm cache verify
 
-# Wipe the npm cache entirely (legacy last resort; --force is required by npm)
+# Wipe the npm cache entirely (legacy last resort; --force is required by npm).
 npm cache clean --force
 
-# --- nvm (Node version manager) ---
-nvm ls-remote                     # list all available Node versions
-nvm install --lts                 # install newest LTS
-nvm install 22                    # install specific major version
+nvm (Node version manager):
+nvm ls-remote                     # List all available Node versions.
+nvm install --lts                 # Install newest LTS.
+nvm install 22                    # Install specific major version.
 nvm use 22
-nvm alias default 22              # set default Node version
-nvm ls                            # list installed versions
+nvm alias default 22              # Set default Node version.
+nvm ls                            # List installed versions.
 ```
 
 ### Python / pip
@@ -253,7 +253,7 @@ pyenv global 3.13                 # set default
 pyenv local 3.13                  # set version for current directory
 pyenv update                      # update pyenv itself (needs pyenv-update plugin)
 
-# --- Homebrew-managed Python note ---
+Homebrew-managed Python note:
 # `brew upgrade` also upgrades brew-installed Python versions.
 # --formula is kept intentionally: plain `brew list | grep python` also
 # matches casks, so this stays scoped to CLI formulae only.
@@ -343,7 +343,7 @@ diskutil apfs list                # container-level free/used space shared acros
 # Verify a volume's filesystem (safe, read-only)
 diskutil verifyVolume /
 
-# Repair a volume's filesystem (⚠️ sudo; usually unneeded on APFS — self-healing)
+# Repair a volume's filesystem (**⚠️ sudo**; usually unneeded on APFS — self-healing)
 # Note: the live boot volume can't be repaired while booted from it —
 # use Recovery Mode (or target a non-boot volume) if repair is really needed.
 sudo diskutil repairVolume /
@@ -362,7 +362,7 @@ sudo tmutil deletelocalsnapshots 2026-09-08-123456   # delete a specific one
 tmutil thinlocalsnapshots / 999999999999 4           # thin snapshots to free space
 
 # Purge RAM disk cache (rarely needed; macOS manages this)
-sudo purge                        # ⚠️ brief slowdown after; mostly placebo on modern macOS
+sudo purge                        # **⚠️** Brief slowdown after; mostly placebo on modern macOS.
 
 # Check free space including purgeable (System Settings may show more free)
 df -h /
@@ -373,16 +373,16 @@ sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder
 
 # Eject/unmount volumes safely
 diskutil eject /Volumes/USBDrive
-diskutil unmountDisk /dev/disk2   # ⚠️ unmounts ALL volumes on that disk
+diskutil unmountDisk /dev/disk2   # **⚠️** Unmounts ALL volumes on that disk.
 
-# Inspect before deleting — see what's actually large, then remove just that
+# Inspect before deleting — see **what is** actually large, then remove just that
 # folder (safer than the blanket wipe below, and just as effective for most cases)
 du -sh ~/Library/Caches/* | sort -rh | head -10
 rm -rf ~/Library/Caches/SomeApp     # delete one app's cache after checking it above
 
-# Clear ALL app caches at once (⚠️ apps must be closed; usually regenerates fine,
+# Clear ALL app caches at once (**⚠️** apps must be closed; usually regenerates fine,
 # but a few apps store real state here — the targeted version above is safer)
-rm -rf ~/Library/Caches/*         # ⚠️ review first — some apps store state here
+rm -rf ~/Library/Caches/*         # **⚠️ Destructive:** Review first — some apps store state here.
 
 # Empty Trash — safer, Finder-native way (handles per-user .Trashes/$UID/
 # structure on external volumes correctly; a raw wildcard glob can hit
@@ -390,7 +390,7 @@ rm -rf ~/Library/Caches/*         # ⚠️ review first — some apps store stat
 osascript -e 'tell application "Finder" to empty trash'
 
 # Empty Trash from all volumes — raw filesystem wildcard
-# ⚠️ irreversible, no confirmation, and the /Volumes/* glob hits EVERY
+# **⚠️ Destructive:** Irreversible, no confirmation, and the `/Volumes/*` glob affects every
 # mounted volume (external drives, network shares, disk images) —
 # unmount anything you don't want touched first, or scope to one volume by name
 sudo rm -rf ~/.Trash/* /Volumes/*/.Trashes/*
@@ -432,10 +432,10 @@ netstat -rn | head -20
 route get default
 
 # Live per-process network usage (network equivalent of `top`)
-nettop                            # some per-process detail needs root; prefix sudo if output is thin
+nettop                            # **⚠️** Some per-process detail needs root; prefix sudo if output is thin.
 
 # Show open network connections + owning process (very useful)
-lsof -i                          # all connections; run under sudo to see other users' sockets
+lsof -i                          # **⚠️** All connections; run under sudo to see other users' sockets.
 lsof -i :3000                     # what's listening on port 3000
 lsof -i -P | grep LISTEN         # all listening ports (no service-name translation)
 
@@ -444,7 +444,7 @@ sudo dscacheutil -flushcache && sudo killall -HUP mDNSResponder
 
 # Wi-Fi diagnostics — wdutil is the reliable option on all modern Macs
 sudo wdutil info                          # current Wi-Fi status/details
-# legacy airport tool — removed on newer macOS releases; may not exist on your Mac
+# **Legacy airport tool** — removed on newer macOS releases. **May not exist on your Mac.**
 /System/Library/PrivateFrameworks/Apple80211.framework/Versions/Current/Resources/airport -I
 
 # Wi-Fi on/off + forget network (confirm your interface via -listallhardwareports above)
@@ -454,7 +454,7 @@ networksetup -removepreferredwirelessnetwork en0 "NetworkName"
 
 # Renew DHCP lease
 sudo ipconfig set en0 BOOTP
-sudo ipconfig set en0 DHCP
+sudo ipconfig set en0 DHCP   # **⚠️** Renews DHCP lease; may disrupt active connections.
 
 # Proxy / VPN related
 scutil --proxy                    # show proxy settings
@@ -462,8 +462,8 @@ scutil --proxy                    # show proxy settings
 # Computer/sharing names
 scutil --get ComputerName
 scutil --get LocalHostName        # Bonjour name (name.local)
-sudo scutil --set ComputerName "NewName"
-sudo scutil --set LocalHostName "NewName"
+sudo scutil --set ComputerName "NewName"   # **⚠️** Changes system name; may affect network services.
+sudo scutil --set LocalHostName "NewName"   # **⚠️** Changes Bonjour name; may affect local network discovery.
 
 # Ports scan of your own machine (see what's exposed)
 lsof -i -P -n | grep -i tcp
@@ -511,7 +511,7 @@ sudo mdutil -s /                  # show indexing status
 
 # Reset an app's state without reinstalling (⚠️ removes that app's saved
 # settings/data — targeted troubleshooting only, not a routine command)
-defaults delete com.apple.Safari  # example — replace with the actual bundle id
+defaults delete com.apple.Safari   # **Example only** — replace with the actual bundle ID
 
 # View/change hidden system preferences (example: show hidden files)
 defaults write com.apple.finder AppleShowAllFiles -bool true && killall Finder
@@ -525,7 +525,7 @@ killall SystemUIServer            # restart menu bar extras
 # Clear the print queue
 cancel -a
 
-# SMC reset (Apple Silicon): just shut down for 30s. Intel Macs: model-specific key combos.
+# SMC reset: Apple Silicon Macs require a 30-second shutdown. Intel Macs use model-specific key combinations (see Apple Support).
 # NVRAM reset (Intel): sudo nvram -c   ⚠️ clears boot settings
 sudo nvram -c                     # ⚠️ Intel Macs only; reboots needed after
 
@@ -597,7 +597,7 @@ renice -n 10 -p 12345             # lower priority of a running process
 
 ---
 
-## 8. Quick Utilities & Clipboard
+## 8. Miscellaneous Utilities
 
 ```bash
 # Clipboard — pipe text in/out without leaving the terminal
@@ -663,7 +663,7 @@ alias c='clear'                        # quickly clear the screen
 alias copy='pbcopy'                    # pipe text to clipboard (e.g., cat key.pub | copy)
 alias cbpaste='pbpaste'                # paste from clipboard — named to avoid shadowing the
                                         # real `paste` utility (merges lines from files)
-ql() { qlmanage -p "$@" >& /dev/null; } # Quick Look from terminal (ql image.png) — must be a
+ql() { qlmanage -p "$@" >& /dev/null; }   # Quick Look from terminal (e.g., `ql image.png`). **Must be a function to handle arguments correctly.**
                                         # function, not an alias, so it actually receives args
 alias lock='/System/Library/CoreServices/"Menu Extras"/User.menu/Contents/Resources/CGSession -suspend'
                                         # forces the real login/lock screen (displaysleepnow only
@@ -689,7 +689,7 @@ alias weather='curl wttr.in/Helsinki'  # weather forecast in the terminal (chang
 
 ---
 
-## Suggested Weekly Routine
+## 10. Suggested Weekly Routine
 
 ```bash
 brew update && brew outdated && mas outdated      # check what needs updating
@@ -702,7 +702,7 @@ df -h /                                           # keep an eye on disk space
 
 ---
 
-## ⚠️ Safety Notes
+## 11. Safety Notes
 
 - **Read before running**: `man <command>` shows the manual; e.g. `man softwareupdate`.
 - **Sudo commands** can break the system when misused — double-check targets of `rm -rf`, `kill -9`, `diskutil repairVolume`.

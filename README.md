@@ -1,6 +1,6 @@
 # macOS Terminal Commands Guide
 
-A practical, version-agnostic quick reference for **updating, maintaining, and monitoring macOS** — the system, apps, and development packages — all from the terminal.
+A practical, version-agnostic quick reference for **managing macOS** — the system, apps, and development packages — all from the terminal.
 
 The full guide lives in [`macos-terminal-commands.md`](macos-terminal-commands.md).
 
@@ -15,10 +15,10 @@ The full guide lives in [`macos-terminal-commands.md`](macos-terminal-commands.m
 | **Security & Gatekeeper** | quarantine removal (`xattr`), Gatekeeper checks (`spctl`), SIP status (`csrutil`) |
 | **System Maintenance Utilities** | Time Machine (`tmutil`), Spotlight reindexing (`mdutil`), `defaults`, Dock/Finder restarts, `sysdiagnose` |
 | **Services & Processes** | `launchctl`, `brew services`, process management, background jobs |
-| **Quick Utilities & Clipboard** | `pbcopy`/`pbpaste`, `mdfind`, `caffeinate`, Quick Look (`qlmanage`), `open .` |
+| **Miscellaneous Utilities** | `pbcopy`/`pbpaste`, `mdfind`, `caffeinate`, Quick Look (`qlmanage`), `open .` |
 | **Useful Aliases** | copy-paste `.zshrc`/`.bashrc` aliases incl. one-shot `update-all` |
 
-Plus a suggested **weekly maintenance routine** and **safety notes** for `sudo`/destructive commands.
+Plus a suggested **weekly maintenance routine** and **explicit safety notes** for `sudo` and destructive commands.
 
 ## Prerequisites
 
@@ -51,15 +51,15 @@ brew update && brew upgrade && mas upgrade && softwareupdate --install --recomme
 - ⚠️ marks commands requiring `sudo` or extra care.
 - Safety scale: unmarked = read-only/diagnostic; ⚠️ = modifies state or needs care; explicit destructive/irreversible warnings = deletes data.
 - Before any `sudo` or destructive command, verify the target and make sure you have a backup.
-- Version-agnostic: if a flag errors on your macOS release, check `man <command>`.
+- If a flag errors on your macOS release, check `man <command>`.
 
 ## Contributing
 
-Found a missing command, a better flag, or an error? Open an issue or a pull request — keep additions version-agnostic and follow the existing `command   # explanation` style.
+Spot a missing command, a better flag, or an error? Open an issue or pull request — keep additions version-agnostic and follow the existing `command   # explanation` style.
 
 ## ⚠️ Disclaimer
 
-This guide includes destructive commands — some can remove caches, reset network or boot settings, or delete data from mounted volumes. Commands — especially those marked ⚠️ — can modify system settings, delete data, or otherwise alter your Mac's state. **Always understand a command before running it, back up important data, and verify against `man <command>` on your macOS release.** The authors are not responsible for any data loss, system damage, or other issues arising from the use of these commands. Use at your own risk.
+This guide includes destructive commands — some can remove caches, reset network or boot settings, or delete data from mounted volumes. Commands marked ⚠️ can modify system settings, delete data, or alter your Mac's state. **Always back up important data, verify commands before running them, and check `man <command>` for your macOS release.** While these commands are tested, the authors cannot be held responsible for unintended outcomes.
 
 ## License
 
